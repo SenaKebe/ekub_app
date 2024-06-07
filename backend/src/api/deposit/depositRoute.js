@@ -43,8 +43,6 @@ router.delete("/delete/:id",depositController.deleteDeposit);
 //  consider week from the month
 // router.get("/period/deposit",depositController.getDepositsForPeriodWithDeposit);
 // router.get("/period",depositController.getDepositsForPeriod); 
-// delete
-router.get("/remaining/total",depositController.getRemainingDepositsWithTotalForPeriod);
 // router.get("/total/remaining",depositController.getTotalRemainingDepositsForPeriod);
 
 

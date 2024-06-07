@@ -98,7 +98,7 @@ model Deposits {
   amount    Decimal
   commition Decimal
   remaining Decimal
-  createdAt DateTime  @default(now())
+  createdAt DateTime? @default(now())
   user      Users      @relation(fields: [userId], references: [id] ,onDelete: Cascade )
   lot       Lots       @relation(fields: [lotId], references: [id] ,onDelete: Cascade )
 }
