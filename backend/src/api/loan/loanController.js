@@ -59,7 +59,7 @@ const loanController = {
             const newLoan = await prisma.loans.create({
               data: {
                 amount: parseFloat(data.amount),
-                count : data.count,
+                // count : data.count,
                 lotId: data.lotId,
                 userId: req.user.id,
               },
@@ -124,7 +124,7 @@ const loanController = {
               where: { id: loanId },
               data: {
                 amount: parseFloat(data.amount),
-                count: data.count,
+                // count: data.count,
                 userId: req.user.id,
               },
             });

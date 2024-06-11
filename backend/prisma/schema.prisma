@@ -120,7 +120,7 @@ model Users {
     lotId     Int
     userId    Int
     amount    Decimal
-    count    Int 
+    // count    Int 
     createdAt DateTime  @default(now())               
   //  isPaidBack  Boolean @default(false) 
   
@@ -131,7 +131,7 @@ model Users {
   model Winners {
     id           Int       @id @default(autoincrement())
     lotId        Int       
-    count        Int
+    // count        Int
     registeredBy Int
     createdAt    DateTime  @default(now())
     // round Rounds    @relation(fields: [roundId], references: [id], onDelete: Cascade)

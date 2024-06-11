@@ -33,13 +33,13 @@ const winnerController = {
           message: "Winner is already registered",
         });
       }
-         const loansOnCount = await prisma.loans.findMany({
-          where: {
-            count: data.count,
-          },
-        });
+        //  const loansOnCount = await prisma.loans.findMany({
+        //   where: {
+        //     count: data.count,
+        //   },
+        // });
   
-        const totalLoansOnCount = loansOnCount.reduce((acc, loan) => acc + parseFloat(loan.amount), 0);
+        // const totalLoansOnCount = loansOnCount.reduce((acc, loan) => acc + parseFloat(loan.amount), 0);
       // Calculate total loans for the lot
       const loans = await prisma.loans.findMany({
         where: {
@@ -64,14 +64,14 @@ const winnerController = {
       }
 
       // Calculate the prize amount
-      const prizeAmount = parseFloat(category.totalAmount) - totalLoans - totalLoansOnCount;
+      const prizeAmount = parseFloat(category.totalAmount) - totalLoans ;
 
       // Register the winner
       const newWinner = await prisma.winners.create({
         data: {
           lotId: data.lotId,
           registeredBy: req.user.id,
-          count: data.count
+          // count: data.count
         },
       });
 
@@ -122,13 +122,13 @@ const winnerController = {
       })
       }
 
-      const loansOnCount = await prisma.loans.findMany({
-        where: {
-          count: data.count || isWinnerExist.count,
-        },
-      });
+      // const loansOnCount = await prisma.loans.findMany({
+      //   where: {
+      //     count: data.count || isWinnerExist.count,
+      //   },
+      // });
 
-      const totalLoansOnCount = loansOnCount.reduce((acc, loan) => acc + parseFloat(loan.amount), 0);
+      // const totalLoansOnCount = loansOnCount.reduce((acc, loan) => acc + parseFloat(loan.amount), 0);
     // Calculate total loans for the lot
     const loans = await prisma.loans.findMany({
       where: {
@@ -153,7 +153,7 @@ const winnerController = {
     }
 
     // Calculate the prize amount
-    const prizeAmount = parseFloat(category.totalAmount) - totalLoans - totalLoansOnCount;
+    const prizeAmount = parseFloat(category.totalAmount) - totalLoans ;
 
       const updatedWinner = await prisma.winners.update({
         where: {
@@ -162,7 +162,7 @@ const winnerController = {
         data: {
           lotId: data.lotId,
           registeredBy: req.user.id,
-          count: data.count
+          // count: data.count
         },
       });
 
