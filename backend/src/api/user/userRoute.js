@@ -3,7 +3,7 @@ import userController from "./userController.js";
 import {isAuthUser,isAdmin} from "../../middlewares/auth.js"
 const userRouter = Router();
 
-userRouter.post("/register",[isAuthUser,isAdmin],userController.register);
+userRouter.post("/register",userController.register);
 userRouter.post('/login',userController.login);
 userRouter.get("/get/:id",userController.getUserById);
 userRouter.get("/get",userController.getAllUsers);

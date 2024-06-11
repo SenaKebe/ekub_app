@@ -7,53 +7,94 @@ const winnerController = {
     try {
       const data = winnerSchema.register.parse(req.body);
 
-      const isLotExist = await prisma.lots.findFirst({
-        where: {
-          id: data.lotId,
-        },
+      const lot = await prisma.lots.findUnique({
+        where: { id: data.lotId },
       });
 
-      if (!isLotExist) {
+      if (!lot) {
         return res.status(404).json({
           success: false,
           message: "Lot not found",
         });
       }
-      // Check if the winner is registered before
-      const isWinnerExist = await prisma.winners.findFirst({
+     
+  
+      
+      // Check if the winner is already registered
+      const existingWinner = await prisma.winners.findFirst({
         where: {
           lotId: data.lotId,
         },
       });
 
-      if (isWinnerExist) {
-        return res.status(404).json({
+      if (existingWinner) {
+        return res.status(400).json({
           success: false,
           message: "Winner is already registered",
         });
       }
+         const loansOnCount = await prisma.loans.findMany({
+          where: {
+            count: data.count,
+          },
+        });
+  
+        const totalLoansOnCount = loansOnCount.reduce((acc, loan) => acc + parseFloat(loan.amount), 0);
+      // Calculate total loans for the lot
+      const loans = await prisma.loans.findMany({
+        where: {
+          lotId: data.lotId,
+        },
+      });
 
+      const totalLoans = loans.reduce((acc, loan) => acc + parseFloat(loan.amount), 0);
+
+      // Fetch the category associated with the lot
+      const category = await prisma.category.findUnique({
+        where: {
+          id: lot.categoryId,
+        },
+      });
+
+      if (!category) {
+        return res.status(404).json({
+          success: false,
+          message: "Category not found",
+        });
+      }
+
+      // Calculate the prize amount
+      const prizeAmount = parseFloat(category.totalAmount) - totalLoans - totalLoansOnCount;
+
+      // Register the winner
       const newWinner = await prisma.winners.create({
         data: {
           lotId: data.lotId,
           registeredBy: req.user.id,
+          count: data.count
         },
       });
 
       return res.status(200).json({
         success: true,
-        message: "Winner registered successfully",
-        data: newWinner,
+        message: `You have won ${prizeAmount}`, // Using template literals here
+        data: {
+          winner: newWinner,
+        },
       });
     } catch (error) {
       next(error);
     }
   },
-
   update: async (req, res, next) => {
     try {
         const id = parseInt(req.params.id.substring(1));
       const data = winnerSchema.update.parse(req.body);
+
+      const lot = await prisma.lots.findUnique({
+        where: { id: data.lotId },
+      });
+
 
       // Check if the winner exists
       const isWinnerExist = await prisma.winners.findFirst({
@@ -68,6 +109,51 @@ const winnerController = {
           message: "Winner not found",
         });
       }
+      const Winner = await prisma.winners.findFirst({
+        where: {
+          id: data.lotId,
+        },
+      });
+
+      if(Winner){
+      return res.status(404).json({
+        success : false,
+        message: "Winner is already registered"
+      })
+      }
+
+      const loansOnCount = await prisma.loans.findMany({
+        where: {
+          count: data.count || isWinnerExist.count,
+        },
+      });
+
+      const totalLoansOnCount = loansOnCount.reduce((acc, loan) => acc + parseFloat(loan.amount), 0);
+    // Calculate total loans for the lot
+    const loans = await prisma.loans.findMany({
+      where: {
+        lotId: data.lotId || isWinnerExist.lotId,
+      },
+    });
+
+    const totalLoans = loans.reduce((acc, loan) => acc + parseFloat(loan.amount), 0);
+
+    // Fetch the category associated with the lot
+    const category = await prisma.category.findUnique({
+      where: {
+        id: lot.categoryId,
+      },
+    });
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    // Calculate the prize amount
+    const prizeAmount = parseFloat(category.totalAmount) - totalLoans - totalLoansOnCount;
 
       const updatedWinner = await prisma.winners.update({
         where: {
@@ -76,49 +162,50 @@ const winnerController = {
         data: {
           lotId: data.lotId,
           registeredBy: req.user.id,
+          count: data.count
         },
       });
 
       return res.status(200).json({
         success: true,
-        message: "Winner updated successfully",
+        message: `Winner has won ${prizeAmount} `,
         data: updatedWinner
       });
     } catch (error) {
       next(error);
     }
   },
-  updateLoanStatus : async (req, res, next) => {
-    const id = parseInt(req.params.id.substring(1));
+  // updateLoanStatus : async (req, res, next) => {
+  //   const id = parseInt(req.params.id.substring(1));
   
-    try {
-      const existingLoan = await prisma.loans.findUnique({
-        where: { id: id },
-      });
+  //   try {
+  //     const existingLoan = await prisma.loans.findUnique({
+  //       where: { id: id },
+  //     });
   
-      if (!existingLoan) {
-        return res.status(404).json({
-          success: false,
-          message: 'Loan not found',
-        });
-      }
+  //     if (!existingLoan) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         message: 'Loan not found',
+  //       });
+  //     }
   
-      const updatedLoan = await prisma.loans.update({
-        where: { id: parseInt(id) },
-        data: {
-          isPaidBack: true,
-        },
-      });
+  //     const updatedLoan = await prisma.loans.update({
+  //       where: { id: parseInt(id) },
+  //       data: {
+  //         isPaidBack: true,
+  //       },
+  //     });
   
-      return res.status(200).json({
-        success: true,
-        message: 'Loan status updated to paid back',
-        data: updatedLoan,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  //     return res.status(200).json({
+  //       success: true,
+  //       message: 'Loan status updated to paid back',
+  //       data: updatedLoan,
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // },
 
 
 

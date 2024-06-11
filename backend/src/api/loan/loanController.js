@@ -27,11 +27,22 @@ const loanController = {
               message: 'Lot not found',
             });
           }
-      
+
+          const winner = await prisma.winners.findFirst({
+            where: { lotId: data.lotId },
+          });
+          console.log(data.lotId);
+      console.log(winner);
+         
+      if (winner) {
+        return res.status(400).json({
+          success: false,
+          message: "You cannot get a loan because you are already registered as a winner for this round",
+        });
+      }
           const loans = await prisma.loans.findMany({
             where: {
               lotId: data.lotId,
-              isPaidBack: false,
             },
           });
       
@@ -48,12 +59,11 @@ const loanController = {
             const newLoan = await prisma.loans.create({
               data: {
                 amount: parseFloat(data.amount),
+                count : data.count,
                 lotId: data.lotId,
                 userId: req.user.id,
-                isPaidBack: false, 
               },
             });
-      
             return res.status(200).json({
               success: true,
               data: newLoan,
@@ -98,7 +108,8 @@ const loanController = {
           const loans = await prisma.loans.findMany({
             where: { lotId: existingLoan.lotId, id: { not: loanId } },
           });
-      
+  
+          
           const totalBorrowed = loans.reduce((acc, loan) => acc + parseFloat(loan.amount), 0);
       
           let allowedLoan;
@@ -113,6 +124,7 @@ const loanController = {
               where: { id: loanId },
               data: {
                 amount: parseFloat(data.amount),
+                count: data.count,
                 userId: req.user.id,
               },
             });
@@ -211,30 +223,7 @@ const loanController = {
           next(error);
         }
       },
-      getUnpaidLoans : async (req, res, next) => {
-        try {
-          const unpaidLoans = await prisma.loans.findMany({
-            where: {
-              isPaidBack: false,
-            },
-          });
       
-          if (unpaidLoans.length === 0) {
-            return res.status(404).json({
-              success: false,
-              message: 'No unpaid loans found',
-            });
-          }
-      
-          return res.status(200).json({
-            success: true,
-            data: unpaidLoans,
-          });
-        } catch (error) {
-          next(error);
-        }
-      }
-
         
       
 

@@ -12,7 +12,7 @@ router.post("/register",[isAuthUser,isAdmin],winnerController.register);
 router.get("/get/:id",winnerController.getSingleWinner);
 router.get("/get",winnerController.getAllWinners);
 router.put("/update/:id",[isAuthUser,isUser],winnerController.update);
-router.put("/updateStatus/:id",winnerController.updateLoanStatus);
+// router.put("/updateStatus/:id",winnerController.updateLoanStatus);
 router.delete("/delete/:id",[isAuthUser,isAdmin],winnerController.delete);
 
 

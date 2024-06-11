@@ -41,31 +41,45 @@ const depositController = {
           message: 'Category not found',
         });
       }
-  
-      const cycleAmount = parseFloat(category.totalAmount) / parseFloat(category.totalCount);
-  
-      req.body.remaining = cycleAmount - (parseFloat(req.body.amount) + parseFloat(req.body.commition));
+
+      req.body.remainingAmount = parseFloat(lot.remainingAmount) - (parseFloat(req.body.amount) + parseFloat(req.body.commition));
+      req.body.remainingDay = parseInt(lot.remainingDay) - 1;
+      req.body.cumulativePayment = parseFloat(lot.cumulativePayment) + (parseFloat(req.body.amount) + parseFloat(req.body.commition)); // Update cumulative payment
+
+   if(req.body.cumulativePayment> category.totalAmount) {
+    return res.status(400).json({
+      success: false,
+      message: `Deposit amount exceeds the remaining amount. You can only deposit up to ${lot.remainingAmount}.`,
+    });
+   }
+
+
+      // const cycleAmount = parseFloat(category.totalAmount) / parseFloat(category.totalCount);
+      req.body.remainingAmountPerDeposit= category.amount - data.amount
+      req.body.remainingCommissionPerDeposit = category.commition - data.commition
+      // req.body.remaining = cycleAmount - (parseFloat(req.body.amount) + parseFloat(req.body.commition));
+      req.body.count =  category.totalCount - lot.remainingDay + 1
   
       const newDeposit = await prisma.deposits.create({
         data: {
           amount: parseFloat(data.amount),
           commition: parseFloat(data.commition),
-          remaining: parseFloat(req.body.remaining),
+          remainingAmountPerDeposit: parseFloat(req.body.remainingAmountPerDeposit),
+          remainingCommissionPerDeposit: parseFloat(req.body.remainingCommissionPerDeposit),
+          count : req.body.count,
           userId: req.user.id,
           lotId: data.lotId,
         },
       });
   
-      req.body.remainingAmount = parseFloat(lot.remainingAmount) - (parseFloat(req.body.amount) + parseFloat(req.body.commition));
-      req.body.remainingDay = parseInt(lot.remainingDay) - 1;
-      const cumulativePayment = parseFloat(lot.cumulativePayment) + (parseFloat(req.body.amount) + parseFloat(req.body.commition)); // Update cumulative payment
+     
   
       const updatedLot = await prisma.lots.update({
         where: { id: data.lotId },
         data: {
-          remainingAmount: req.body.remainingAmount,
+          remainingAmount: req.body.remainingAmount, 
           remainingDay: req.body.remainingDay,
-          cumulativePayment: cumulativePayment, // Save cumulative payment
+          cumulativePayment: req.body.cumulativePayment, 
           isCompleted: req.body.remainingAmount === 0 ? true : false,
         },
       });
@@ -119,26 +133,35 @@ const depositController = {
             message: 'Category not found',
           });
         }
-    
-        const cycleAmount = category.totalAmount / category.totalCount;
-    
-        req.body.remaining = cycleAmount - (req.body.amount + req.body.commition);
-    
-        const updatedDeposit = await prisma.deposits.update({
-          where: { id: id },
-          data: {
-            amount: data.amount,
-            commition: data.commition,
-            remaining: req.body.remaining,
-          },
-        });
-    
+
+      
         const amountDifference = data.amount - existingDeposit.amount;
         const commitionDifference = data.commition - existingDeposit.commition;
     
         req.body.remainingAmount = lot.remainingAmount - amountDifference - commitionDifference;
         req.body.remainingDay = lot.remainingDay; // No change in remainingDay unless it's specific to the deposit
         const cumulativePayment = parseInt(lot.cumulativePayment) + parseInt(amountDifference) + parseInt(commitionDifference); // Update cumulative payment
+  
+     if(cumulativePayment > category.totalAmount) {
+      return res.status(400).json({
+        success: false,
+        message: `Deposit amount exceeds the remaining amount. You can only deposit up to ${parseFloat(lot.remainingAmount) + parseFloat(existingDeposit.amount)+ parseFloat(existingDeposit.commition) }.`,
+      });
+     }
+
+        // const cycleAmount = category.totalAmount / category.totalCount;
+        req.body.remainingAmountPerDeposit= category.amount - data.amount
+        req.body.remainingCommissionPerDeposit = category.commition - data.commition
+        // req.body.remaining = cycleAmount - (req.body.amount + req.body.commition);
+    
+        const updatedDeposit = await prisma.deposits.update({
+          where: { id: id },
+          data: {
+            amount: data.amount,
+            commition: data.commition,
+            remainingAmountPerDeposit: parseFloat(req.body.remainingAmountPerDeposit),
+            remainingCommissionPerDeposit: parseFloat(req.body.remainingCommissionPerDeposit), },
+        });
     
         const updatedLot = await prisma.lots.update({
           where: { id: existingDeposit.lotId },
@@ -486,13 +509,21 @@ getSingleDeposit: async (req, res, next) => {
           }
         },
 
-        getMonthlyDepositsForYear : async (req, res, next) => {
+        getMonthlyDepositsForYear: async (req, res, next) => {
           try {
-            const today = new Date();
-            const startOfYearDate = startOfYear(today);
-            const endOfYearDate = endOfYear(today);
-        
-            // Find deposits for the current year
+            // Get the year from the URL parameters
+            const year = parseInt(req.params.year, 10);
+            if (isNaN(year) || year < 1000 || year > 9999) {
+              return res.status(400).json({
+                success: false,
+                message: 'Invalid year specified',
+              });
+            }
+      
+            const startOfYearDate = startOfYear(new Date(year, 0, 1));
+            const endOfYearDate = endOfYear(new Date(year, 11, 31));
+            
+            // Find deposits for the specified year
             const deposits = await prisma.deposits.findMany({
               where: {
                 createdAt: {
@@ -501,24 +532,24 @@ getSingleDeposit: async (req, res, next) => {
                 },
               },
             });
-        
+      
             // Categorize deposits by month
             const monthlyDeposits = Array.from({ length: 12 }, () => []);
-        
+      
             deposits.forEach(deposit => {
               const monthIndex = getMonth(deposit.createdAt);
               monthlyDeposits[monthIndex].push(deposit);
             });
-        
+      
             // Format the response
             const monthlyDepositsFormatted = monthlyDeposits.map((deposits, index) => ({
-              month: format(new Date(today.getFullYear(), index, 1), 'MMMM'),
+              month: format(new Date(year, index, 1), 'MMMM'),
               deposits,
             }));
-        
+      
             return res.status(200).json({
               success: true,
-              message: 'Monthly deposits for the current year',
+              message: `Monthly deposits for the year ${year}`,
               data: monthlyDepositsFormatted,
             });
           } catch (error) {
@@ -527,54 +558,62 @@ getSingleDeposit: async (req, res, next) => {
         },
 
 
-      getDepositsForMonthandEachYear  : async (req, res, next) => {
-        try {
-          const year = parseInt(req.query.year, 10);
-          const month = parseInt(req.query.month, 10);
+        getDepositsForWeekOfYear: async (req, res, next) => {
+          try {
+            const year = parseInt(req.params.year, 10);
+            const week = parseInt(req.params.week, 10);
       
-          // Validate year and month
-          if (isNaN(year) || year < 1000 || year > 9999) {
-            return res.status(400).json({
-              success: false,
-              message: 'Invalid year parameter. Please provide a valid year.',
-            });
-          }
+            // Validate year and week
+            if (isNaN(year) || year < 1000 || year > 9999) {
+              return res.status(400).json({
+                success: false,
+                message: 'Invalid year parameter. Please provide a valid year.',
+              });
+            }
       
-          if (isNaN(month) || month < 1 || month > 12) {
-            return res.status(400).json({
-              success: false,
-              message: 'Invalid month parameter. Please provide a valid month (1-12).',
-            });
-          }
+            if (isNaN(week) || week < 1 || week > 52) {
+              return res.status(400).json({
+                success: false,
+                message: 'Invalid week parameter. Please provide a valid week (1-52).',
+              });
+            }
       
-          const startOfMonthDate = new Date(year, month - 1, 1);  // First day of the specified month
-          const endOfMonthDate = new Date(year, month, 0, 23, 59, 59, 999);  // Last day of the specified month
+            // Calculate the start and end dates for the specified week of the year
+            const startOfYearDate = new Date(year, 0, 1);
+            const startOfWeekDate = startOfWeek(addWeeks(startOfYearDate, week - 1), { weekStartsOn: 1 });
+            const endOfWeekDate = endOfWeek(startOfWeekDate, { weekStartsOn: 1 });
       
-          // Find deposits for the specified month and year
-          const deposits = await prisma.deposits.findMany({
-            where: {
-              createdAt: {
-                gte: startOfMonthDate,
-                lt: endOfMonthDate,
+            // Find deposits for the specified week of the year
+            const deposits = await prisma.deposits.findMany({
+              where: {
+                createdAt: {
+                  gte: startOfWeekDate,
+                  lt: endOfWeekDate,
+                },
               },
-            },
-          });
+            });
       
-          return res.status(200).json({
-            success: true,
-            message: `Deposits for ${format(startOfMonthDate, 'MMMM yyyy')}`,
-            data: deposits,
-          });
-        } catch (error) {
-          next(error);
-        }
-      },
+            // Calculate the total deposit amount
+            const totalDeposit = deposits.reduce((sum, deposit) => {
+              return sum + parseFloat(deposit.amount);
+            }, 0);
+      
+            return res.status(200).json({
+              success: true,
+              message: `Deposits for week ${week} of ${year}`,
+              data: deposits,
+              totalDeposit: totalDeposit,
+            });
+          } catch (error) {
+            next(error);
+          }
+        },
 
-      getDepositsForMonthandEachYearWithTotalDeposit  : async (req, res, next) => {
+      getDepositsForMonthandEachYearWithTotalDeposit: async (req, res, next) => {
         try {
-          const year = parseInt(req.query.year, 10);
-          const month = parseInt(req.query.month, 10);
-      
+          const year = parseInt(req.params.year, 10);  // Extract year from path parameters
+          const month = parseInt(req.query.month, 10);  // Extract month from query parameters
+    
           // Validate year and month
           if (isNaN(year) || year < 1000 || year > 9999) {
             return res.status(400).json({
@@ -582,17 +621,17 @@ getSingleDeposit: async (req, res, next) => {
               message: 'Invalid year parameter. Please provide a valid year.',
             });
           }
-      
+    
           if (isNaN(month) || month < 1 || month > 12) {
             return res.status(400).json({
               success: false,
               message: 'Invalid month parameter. Please provide a valid month (1-12).',
             });
           }
-      
+    
           const startOfMonthDate = new Date(year, month - 1, 1);  // First day of the specified month
           const endOfMonthDate = new Date(year, month, 0, 23, 59, 59, 999);  // Last day of the specified month
-      
+    
           // Find deposits for the specified month and year
           const deposits = await prisma.deposits.findMany({
             where: {
@@ -602,12 +641,12 @@ getSingleDeposit: async (req, res, next) => {
               },
             },
           });
-      
+    
           // Calculate the total deposit amount
           const totalDeposit = deposits.reduce((sum, deposit) => {
             return sum + parseFloat(deposit.amount);
           }, 0);
-      
+    
           return res.status(200).json({
             success: true,
             message: `Deposits for ${format(startOfMonthDate, 'MMMM yyyy')}`,
@@ -852,7 +891,8 @@ getTotalRemainingDepositsForPeriod : async (req, res, next) => {
     next(error);
   }
 },
-getRemainingDepositsForPeriod : async (req, res, next) => {
+
+getRemainingDepositsForPeriod: async (req, res, next) => {
   try {
     const year = parseInt(req.query.year, 10);
     const month = req.query.month ? parseInt(req.query.month, 10) : null;
@@ -878,6 +918,7 @@ getRemainingDepositsForPeriod : async (req, res, next) => {
         message: 'Invalid week number specified',
       });
     }
+
     let startDate, endDate;
     if (month === null && weekNumber === null) {
       // If month and week number are not provided, return deposits for the entire year
@@ -907,18 +948,21 @@ getRemainingDepositsForPeriod : async (req, res, next) => {
 
     const deposits = await prisma.deposits.findMany({
       where: {
-        createdAt: {
-          gte: startDate,
-          lte: endDate,
-        },
+        AND: [
+          { createdAt: { gte: startDate, lte: endDate } },
+          {
+            OR: [
+              { remainingAmountPerDeposit: { not: 0 } },
+              { remainingCommissionPerDeposit: { not: 0 } }
+            ]
+          }
+        ]
       },
       orderBy: { createdAt: 'asc' }, // Order deposits by createdAt date
     });
 
     // Filter out deposits with zero remaining amount and sort by remaining amount in descending order
-    const filteredAndSortedDeposits = deposits
-      .filter(deposit => parseFloat(deposit.remaining) !== 0)
-      .sort((a, b) => parseFloat(b.remaining) - parseFloat(a.remaining));
+    const filteredAndSortedDeposits = deposits.sort((a, b) => parseFloat(b.remaining) - parseFloat(a.remaining));
 
     let remainingDeposits = {};
     filteredAndSortedDeposits.forEach((deposit) => {
@@ -930,7 +974,8 @@ getRemainingDepositsForPeriod : async (req, res, next) => {
         id: deposit.id,
         lotId: deposit.lotId,
         userId: deposit.userId,
-        remaining: deposit.remaining,
+        remainingAmountPerDeposit: deposit.remainingAmountPerDeposit,
+        remainingCommissionPerDeposit: deposit.remainingCommissionPerDeposit,
         createdAt: deposit.createdAt,
       });
     });
@@ -944,7 +989,6 @@ getRemainingDepositsForPeriod : async (req, res, next) => {
     next(error);
   }
 },
-
 getRemainingDepositsForYear : async (req, res, next) => {
   try {
     const year = parseInt(req.query.year, 10);
