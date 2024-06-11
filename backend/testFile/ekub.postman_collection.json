@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"email\": \"senakebed@yahoo.com\",\r\n  \"password\": \"securepassword\",\r\n  \"firstName\": \"sena\",\r\n  \"middleName\": \"kebede\",\r\n  \"lastName\": \"geneti\"\r\n}\r\n",
+							"raw": "{\r\n  \"email\": \"senasifan@yahoo.com\",\r\n  \"password\": \"securepassword\",\r\n  \"firstName\": \"sena\",\r\n  \"middleName\": \"kebede\",\r\n  \"lastName\": \"geneti\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -271,10 +271,15 @@
 					"name": "register",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"name\": \"Category 2\",\r\n  \"amount\": 200,\r\n  \"commition\": 2,\r\n  \"totalCount\": 5,\r\n  \"duration\":\" 5 months\",\r\n  \"collectionCycle\": \"1 month\"\r\n}\r\n",
+							"raw": "{\r\n  \"name\": \"Category 1\",\r\n  \"amount\": 200,\r\n  \"commition\": 2,\r\n  \"totalCount\": 5,\r\n  \"duration\":\" 5 months\",\r\n  \"collectionCycle\": \"1 month\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -433,7 +438,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"categoryId\": 2,\r\n  \"firstName\": \"seni\",\r\n  \"middleName\": \"Kebede\",\r\n  \"lastName\": \"Geneti\",\r\n  \"gender\": \"MALE\",\r\n  \"city\": \"New York\",\r\n  \"street\": \"123 Main St\"\r\n}\r\n",
+							"raw": "{\r\n  \"categoryId\": 1,\r\n  \"firstName\": \"sifen\",\r\n  \"middleName\": \"kebede\",\r\n  \"lastName\": \"Geneti\",\r\n  \"gender\": \"MALE\",\r\n  \"city\": \"New York\",\r\n  \"street\": \"123 Main St\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -646,12 +651,46 @@
 							"name": "Deposit",
 							"item": [
 								{
-									"name": "deposit&totalSpecifyingTheYearAndMonth",
+									"name": "deposit&totalSpecifyingTheWeek",
 									"request": {
 										"method": "GET",
-										"header": [],
+										"header": [
+											{
+												"key": "authorization",
+												"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
+											}
+										],
 										"url": {
-											"raw": "http://localhost:7777/api/deposit/year/month/total/?year=2024&month=6",
+											"raw": "http://localhost:7777/api/deposit/year/2024/week/24",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "7777",
+											"path": [
+												"api",
+												"deposit",
+												"year",
+												"2024",
+												"week",
+												"24"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TotalDepositInSpecifiedYearAndMonth",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "authorization",
+												"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:7777/api/deposit/year/month/total/2024?month=6",
 											"protocol": "http",
 											"host": [
 												"localhost"
@@ -663,13 +702,9 @@
 												"year",
 												"month",
 												"total",
-												""
+												"2024"
 											],
 											"query": [
-												{
-													"key": "year",
-													"value": "2024"
-												},
 												{
 													"key": "month",
 													"value": "6"
@@ -680,45 +715,17 @@
 									"response": []
 								},
 								{
-									"name": "TotalDepositInSpecifiedYearAndMonth",
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "http://localhost:7777/api/deposit/year/month/total?year=2023&month=5",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "7777",
-											"path": [
-												"api",
-												"deposit",
-												"year",
-												"month",
-												"total"
-											],
-											"query": [
-												{
-													"key": "year",
-													"value": "2023"
-												},
-												{
-													"key": "month",
-													"value": "5"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "depositWithinSpecifiedYear",
 									"request": {
 										"method": "GET",
-										"header": [],
+										"header": [
+											{
+												"key": "authorization",
+												"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
+											}
+										],
 										"url": {
-											"raw": "http://localhost:7777/api/deposit/year/month/by?year=2025",
+											"raw": "http://localhost:7777/api/deposit/year/month/2024",
 											"protocol": "http",
 											"host": [
 												"localhost"
@@ -729,13 +736,7 @@
 												"deposit",
 												"year",
 												"month",
-												"by"
-											],
-											"query": [
-												{
-													"key": "year",
-													"value": "2025"
-												}
+												"2024"
 											]
 										}
 									},
@@ -750,9 +751,14 @@
 									"name": "getReminingForSpecifiedYearMonthAndWeek",
 									"request": {
 										"method": "GET",
-										"header": [],
+										"header": [
+											{
+												"key": "authorization",
+												"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
+											}
+										],
 										"url": {
-											"raw": "http://localhost:7777/api/deposit/remaining/?year=2024&month=6&week=23",
+											"raw": "http://localhost:7777/api/deposit/remaining/?year=2024&month=6&week=24",
 											"protocol": "http",
 											"host": [
 												"localhost"
@@ -775,7 +781,7 @@
 												},
 												{
 													"key": "week",
-													"value": "23"
+													"value": "24"
 												}
 											]
 										}
@@ -1179,12 +1185,12 @@
 						"header": [
 							{
 								"key": "authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzE3NTA5MzQwfQ.Ine6ryYXWc6V5HUPpA_4HUMv64vLwFjHjlkammhw9Q8"
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"lotId\": 9,\r\n  \"amount\": 200,\r\n  \"commition\": 2\r\n}\r\n",
+							"raw": "{\r\n  \"lotId\": 2,\r\n  \"amount\": 10,\r\n  \"commition\": 2\r\n\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1260,9 +1266,14 @@
 					"name": "deleteDeposit",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "authorization",
+								"value": "aaeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
+							}
+						],
 						"url": {
-							"raw": "http://localhost:7777/api/deposit/delete/:32",
+							"raw": "http://localhost:7777/api/deposit/delete/:10",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1272,11 +1283,11 @@
 								"api",
 								"deposit",
 								"delete",
-								":32"
+								":10"
 							],
 							"variable": [
 								{
-									"key": "32",
+									"key": "10",
 									"value": ""
 								}
 							]
@@ -1288,10 +1299,15 @@
 					"name": "updateDeposit",
 					"request": {
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzE3NjU4NzcyfQ.wZlrtf7-4FkBykg4OHHqdpRSW0MVNCu0vtvR8dzWhlY"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"amount\": 150,\r\n  \"commition\": 2\r\n}",
+							"raw": "{\r\n  \"amount\": 300,\r\n  \"commition\": 2\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1299,7 +1315,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7777/api/deposit/update/:32",
+							"raw": "http://localhost:7777/api/deposit/update/:11",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1309,11 +1325,11 @@
 								"api",
 								"deposit",
 								"update",
-								":32"
+								":11"
 							],
 							"variable": [
 								{
-									"key": "32",
+									"key": "11",
 									"value": ""
 								}
 							]
@@ -1394,12 +1410,12 @@
 						"header": [
 							{
 								"key": "authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzE3NjU4NzcyfQ.wZlrtf7-4FkBykg4OHHqdpRSW0MVNCu0vtvR8dzWhlY"
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"lotId\": 6,\r\n  \"amount\": 1\r\n}\r\n",
+							"raw": "{\r\n\r\n  \"lotId\": 1,\r\n  \"amount\": 100,\r\n  \"count\": 3\r\n  \r\n\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1429,12 +1445,12 @@
 						"header": [
 							{
 								"key": "authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzE3NjU4NzcyfQ.wZlrtf7-4FkBykg4OHHqdpRSW0MVNCu0vtvR8dzWhlY"
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"amount\": 7\r\n}\r\n",
+							"raw": "{\r\n  \"amount\": 2\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1471,11 +1487,11 @@
 						"header": [
 							{
 								"key": "authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzE3NjU4NzcyfQ.wZlrtf7-4FkBykg4OHHqdpRSW0MVNCu0vtvR8dzWhlY"
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:7777/api/loan/delete/:5",
+							"raw": "http://localhost:7777/api/loan/delete/:13",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1485,11 +1501,11 @@
 								"api",
 								"loan",
 								"delete",
-								":5"
+								":13"
 							],
 							"variable": [
 								{
-									"key": "5",
+									"key": "13",
 									"value": ""
 								}
 							]
@@ -1580,7 +1596,7 @@
 			"name": "Winner",
 			"item": [
 				{
-					"name": "update",
+					"name": "updateWinner",
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -1591,7 +1607,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"lotId\": 9\r\n\r\n}\r\n",
+							"raw": "{\r\n  \"lotId\": 2,\r\n   \"count\": 4\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1622,7 +1638,7 @@
 					"response": []
 				},
 				{
-					"name": "register",
+					"name": "registerWinner",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1633,7 +1649,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"lotId\": 7\r\n\r\n}\r\n",
+							"raw": "{\r\n  \"lotId\": 2,\r\n  \"count\" : 4\r\n\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1660,9 +1676,14 @@
 					"name": "deleteWinner",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
+							}
+						],
 						"url": {
-							"raw": "http://localhost:7777/api/winner/delete/:1",
+							"raw": "http://localhost:7777/api/winner/delete/:11",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1672,11 +1693,11 @@
 								"api",
 								"winner",
 								"delete",
-								":1"
+								":11"
 							],
 							"variable": [
 								{
-									"key": "1",
+									"key": "11",
 									"value": ""
 								}
 							]
@@ -1728,6 +1749,156 @@
 								"api",
 								"winner",
 								"get"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "remainingPayment",
+			"item": [
+				{
+					"name": "registerRemaining",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n \"commissionPaid\": 1,\r\n  \"depositId\": 11\r\n\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7777/api/remaining/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"remaining",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:7777/api/remaining/delete/:23",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"remaining",
+								"delete",
+								":23"
+							],
+							"variable": [
+								{
+									"key": "23",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateRemainig",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n \"amountPaid\": 20,\r\n \"commissionPaid\": 2\r\n\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7777/api/remaining/update/:23",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"remaining",
+								"update",
+								":23"
+							],
+							"variable": [
+								{
+									"key": "23",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSingleRemaining",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoic2VuYSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzg5NDE3OX0.xj5-0r9I_Z0pP0QwRxFaNAGD2VK8hYFdeh6nNohjnkE",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:7777/api/remaining/get/:31",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"api",
+								"remaining",
+								"get",
+								":31"
+							],
+							"variable": [
+								{
+									"key": "31",
+									"value": ""
+								}
 							]
 						}
 					},
