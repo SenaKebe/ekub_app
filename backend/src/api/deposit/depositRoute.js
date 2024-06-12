@@ -16,7 +16,7 @@ router.get("/week/day",[isAuthUser,isAdmin],depositController.getDepositsWithinW
 //get deposit of day,  month , and  year  I specify
 
 // router.get("/month/day",[isAuthUser,isAdmin],depositController.getDepositsWithinMonthByDay);
-router.get("/year/month/:year",[isAuthUser,isAdmin],depositController.getMonthlyDepositsForYear);  // works fine 
+router.get("/year/month/:year",[isAuthUser,isAdmin],depositController.getMonthlyDepositsForYear);  // works fine //?????
 router.get('/year/month/total/:year',[isAuthUser,isAdmin], depositController.getDepositsForMonthandEachYearWithTotalDeposit);   //works fine 
 router.get("/year/:year/week/:week",[isAuthUser,isAdmin],depositController.getDepositsForWeekOfYear); // works fine 
 

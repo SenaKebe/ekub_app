@@ -31,11 +31,10 @@ const userController = {
                 message: "Email is already in use",
             });
         }
+        
 
-        // Hash the password
         const password = await bcrypt.hash(data.password, 10);
 
-        // Create a new user with profile details and connect to the lot
         const newUser = await prisma.users.create({
             data: {
                 email: data.email,
@@ -53,7 +52,7 @@ const userController = {
             data: newUser,
         });
     } catch (error) {
-        // Handle errors, such as parsing errors or database errors
+
         if (error instanceof z.ZodError) {
             return res.status(400).json({
                 success: false,

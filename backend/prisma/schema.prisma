@@ -143,8 +143,8 @@ model Users {
     userId       Int
     lotId        Int
     depositId    Int 
-    amountPaid   Decimal? @default(0)
-    commissionPaid Decimal? @default(0)
+    amountPaid   Decimal? 
+    commissionPaid Decimal? 
     paymentDate  DateTime  @default(now())
     deposit Deposits @relation(fields: [depositId], references: [id], onDelete: Cascade)
     user       Users     @relation(fields: [userId], references: [id], onDelete: Cascade)

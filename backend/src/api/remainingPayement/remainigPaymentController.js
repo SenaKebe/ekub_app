@@ -46,8 +46,26 @@ const remainingController = {
             });
         }
 
-        // Fetch the deposit using depositId from request body
-       
+          // Calculate the new amounts considering defaults if not provided
+          const amountPaid = parseFloat(data.amountPaid || 0);
+          const commissionPaid = parseFloat(data.commissionPaid || 0);
+          const newAmout = parseFloat(deposit.amount) + amountPaid;
+          const newCommission = parseFloat(deposit.commition) + commissionPaid;
+  
+          // Check if the new amounts exceed the category limits
+          if (newAmout > category.amount) {
+              return res.status(400).json({
+                  success: false,
+                  message: `The amount you are trying to deposit exceeds the remaining amount. You can only deposit up to ${category.amount - deposit.amount}.`
+              });
+          }
+  
+          if (newCommission > category.commition) {
+              return res.status(400).json({
+                  success: false,
+                  message: `The commission you are trying to deposit exceeds the remaining commission. You can only deposit up to ${category.commition - deposit.commition}.`
+              });
+          }
 
       
         // Create a new remaining payment entry
@@ -148,23 +166,19 @@ update: async (req, res, next) => {
               message: 'Deposit not found',
           });
       }
+const categoryId = lot.categoryId
+const category = await prisma.category.findUnique({
+    where: { id: categoryId },
+});
+
+
 
       // Calculate the difference in amounts
       const amountDifference = parseFloat(data.amountPaid || 0) - parseFloat(existingPayment.amountPaid || 0);
       console.log(amountDifference);
       const commissionDifference = parseFloat(data.commissionPaid || 0) - parseFloat(existingPayment.commissionPaid || 0);
 
-      // Update the existing remaining payment entry
-      const updatedPayment = await prisma.remainingPayement.update({
-          where: { id: id },
-          data: {
-              amountPaid: data.amountPaid || 0,
-              commissionPaid: data.commissionPaid || 0,
-              count: existingPayment.count,
-          },
-      });
-
-      // Calculate new amounts for deposit
+      
       const newAmount = parseFloat(deposit.amount) + amountDifference;
       console.log(deposit.amount);
       console.log(newAmount);
@@ -172,7 +186,33 @@ update: async (req, res, next) => {
       const remainingAmount = parseFloat(deposit.remainingAmountPerDeposit) - amountDifference;
       const remainingCommission = parseFloat(deposit.remainingCommissionPerDeposit) - commissionDifference;
 
-      // Update the deposit with new calculated values
+
+
+
+
+
+      if ( newAmount > category.amount) {
+        return res.status(400).json({
+            success: false,
+            message: `The  amount you are trying to deposit exceeds the remainig amount . You can only deposit up to ${parseFloat(category.amount) - parseFloat(deposit.amount)+ parseFloat(existingPayment.amountPaid)}.`
+        });
+    }
+
+    if (newCommition > category.commition) {
+        return res.status(400).json({
+            success: false,
+            message: `The  amount you are trying to deposit exceeds the remainig commission. You can only deposit up to ${parseFloat(category.commition) - parseFloat(deposit.commition)+ parseFloat(existingPayment.commissionPaid)}.`
+        });
+    } 
+      // Update the existing remaining payment entry
+      const updatedPayment = await prisma.remainingPayement.update({
+          where: { id: id },
+          data: {
+              amountPaid: parseFloat(data.amountPaid),
+              commissionPaid: parseFloat(data.commissionPaid),
+            //   count: existingPayment.count,
+          },
+      });
       const updatedDeposit = await prisma.deposits.update({
           where: { id: deposit.id },
           data: {

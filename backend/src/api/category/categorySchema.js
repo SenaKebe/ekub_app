@@ -13,8 +13,8 @@ import {z} from "zod"
           amount: z.number().positive().optional(),
           commition: z.number().positive().optional(),
           totalCount: z.number().int().optional(),
-          collectionCycle:z.string().min(1),
-          duration: z.string().min(1)
+          collectionCycle:z.string().min(1).optional(),
+          duration: z.string().min(1).optional()
         }),
      
 

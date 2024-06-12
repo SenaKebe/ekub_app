@@ -30,9 +30,8 @@ const categoryController = {
   update: async (req, res, next) => {
     const id = parseInt(req.params.id.substring(1));
     const data = categorySchema.update.parse(req.body);
-    req.body.totalAmount = req.body.totalCount * (req.body.amount + req.body.commition);
-    // You might want to consider calculating totalAmount based on just commission here
-     req.body.totalCommition = req.body.totalCount * req.body.commition; 
+  
+    
     const categoryExist = await prisma.category.findFirst({
       where: {
         id: parseInt(id), 
@@ -44,6 +43,14 @@ const categoryController = {
         message: "Category not found",
       });
     }
+    const  newAmount = data.amount || categoryExist.amount
+    const  newCommission = data.commition || categoryExist.commition
+   const totalCount = data.totalCount|| categoryExist.totalCount
+   const newName = data.name || categoryExist.name
+  
+   req.body.totalAmount = totalCount * (newAmount + newCommission);
+    // You might want to consider calculating totalAmount based on just commission here
+     req.body.totalCommition = totalCount * newCommission; 
 
     const updatedCategory = await prisma.category.update({
       where: {
@@ -51,9 +58,9 @@ const categoryController = {
       },
       data: {
         name: data.name,
-        amount: data.amount,
-        commition: data.commition,
-        totalCount: req.body.totalCount,
+        amount: newAmount,
+        commition: newCommission,
+        totalCount: totalCount,
         totalAmount: req.body.totalAmount,
         totalCommition: req.body.totalCommition,
         duration:data.duration,

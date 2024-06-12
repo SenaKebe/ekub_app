@@ -45,15 +45,24 @@ const depositController = {
       req.body.remainingAmount = parseFloat(lot.remainingAmount) - (parseFloat(req.body.amount) + parseFloat(req.body.commition));
       req.body.remainingDay = parseInt(lot.remainingDay) - 1;
       req.body.cumulativePayment = parseFloat(lot.cumulativePayment) + (parseFloat(req.body.amount) + parseFloat(req.body.commition)); // Update cumulative payment
+      if (data.amount > category.amount) {
+        return res.status(400).json({
+            success: false,
+            message: `The deposit amount exceeds the amount allowed for one cycle. You can only deposit up to ${category.amount}.`
+        });
+    }
 
-   if(req.body.cumulativePayment> category.totalAmount) {
+    if (data.commition > category.commition) {
+        return res.status(400).json({
+            success: false,
+            message: `The commission exceeds the allowed amount for one cycle. You can only deposit up to ${category.commition}.`
+        });
+    }   if(req.body.cumulativePayment> category.totalAmount) {
     return res.status(400).json({
       success: false,
-      message: `Deposit amount exceeds the remaining amount. You can only deposit up to ${lot.remainingAmount}.`,
+      message: `The cumulative payment exceeds the total allowed amount.. You can only deposit up to ${lot.remainingAmount}.`,
     });
    }
-
-
       // const cycleAmount = parseFloat(category.totalAmount) / parseFloat(category.totalCount);
       req.body.remainingAmountPerDeposit= category.amount - data.amount
       req.body.remainingCommissionPerDeposit = category.commition - data.commition
@@ -141,7 +150,22 @@ const depositController = {
         req.body.remainingAmount = lot.remainingAmount - amountDifference - commitionDifference;
         req.body.remainingDay = lot.remainingDay; // No change in remainingDay unless it's specific to the deposit
         const cumulativePayment = parseInt(lot.cumulativePayment) + parseInt(amountDifference) + parseInt(commitionDifference); // Update cumulative payment
+        if (data.amount > category.amount) {
+          return res.status(400).json({
+              success: false,
+              message: `The deposit amount exceeds the amount allowed for one cycle. You can only deposit up to ${category.amount}.`
+          });
+      }
   
+      if (data.commition > category.commition) {
+          return res.status(400).json({
+              success: false,
+              message: `The commission exceeds the allowed amount for one cycle. You can only deposit up to ${category.commition}.`
+          });
+      } 
+
+
+
      if(cumulativePayment > category.totalAmount) {
       return res.status(400).json({
         success: false,
