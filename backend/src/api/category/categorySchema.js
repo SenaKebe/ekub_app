@@ -4,7 +4,7 @@ import {z} from "zod"
           name: z.string().min(1).max(255),
           amount: z.number().positive(),
           commition: z.number().positive(),
-          totalCount: z.number().int().optional(),
+          totalCount: z.number().int(),
           collectionCycle:z.string().min(1),
           duration: z.string().min(1)
         }),

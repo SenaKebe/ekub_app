@@ -13,61 +13,64 @@ import {isAuthUser,isAdmin} from "../../middlewares/auth.js"
 const userController = {
   register: async (req, res, next) => {
     console.log("sena");
-
+  
     try {
-        // Assuming userSchema.register.parse exists and returns a plain object
-        const data = userSchema.register.parse(req.body);
-
-        // Check if the email exists
-        const isUserExist = await prisma.users.findFirst({
-            where: {
-                email: data.email,
-            },
-        });
-
-        if (isUserExist) {
-            return res.status(404).json({
-                success: false,
-                message: "Email is already in use",
-            });
-        }
-        
-
-        const password = await bcrypt.hash(data.password, 10);
-
-        const newUser = await prisma.users.create({
-            data: {
-                email: data.email,
-                password: password,
-                activeStatus: STATUS.ACTIVE, // Assuming STATUS.ACTIVE exists
-               firstName: data.firstName,
-               middleName: data.middleName,
-               lastName: data.lastName,
-                    
-                    },
-                })
-        return res.status(200).json({
-            success: true,
-            message: "User created successfully",
-            data: newUser,
-        });
-    } catch (error) {
-
-        if (error instanceof z.ZodError) {
-            return res.status(400).json({
-                success: false,
-                message: "Validation error",
-                errors: error.errors,
-            });
-        }
-
-        console.error(error);
-        return res.status(500).json({
+      const requiredFields = ["email", "firstName", "middleName", "lastName"];
+      for (const field of requiredFields) {
+        if (!req.body[field]) {
+          return res.status(403).json({
             success: false,
-            message: "An error occurred while creating the user",
+            message: `${field} is required`,          
+          });
+        }
+      }
+  
+      const data = userSchema.register.parse(req.body);
+  
+      const isUserExist = await prisma.users.findFirst({
+        where: {
+          email: data.email,
+        },
+      });
+  
+      if (isUserExist) {
+        return res.status(400).json({
+          success: false,
+          message: "Email is already in use",
         });
+      }
+  
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+  
+      // Create a new user with profile details
+      const newUser = await prisma.users.create({
+        data: {
+          email: data.email,
+          password: hashedPassword,
+          activeStatus: STATUS.ACTIVE, // Assuming STATUS.ACTIVE exists
+          firstName: data.firstName,
+          middleName: data.middleName,
+          lastName: data.lastName,
+          gender: data.gender, // Ensure to include the gender field
+        },
+      });
+  
+      return res.status(201).json({
+        success: true,
+        message: "User created successfully",
+        data: newUser,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while creating the user",
+      });
     }
-},
+  },
+  
+  
   login : async (req, res, next) => {
     const data = userSchema.login.parse(req.body);
   
@@ -83,6 +86,13 @@ const userController = {
         message: "user not found",
       });
     }
+    if (user.activeStatus !== "ACTIVE") {
+      return res.status(404).json({
+        success: false,
+        message: "Your account is inactive",
+      });
+    }
+
     // Compare password using bcrypt
     if (!bcrypt.compareSync(data.password, user.password)) {
       return res.status(404).json({

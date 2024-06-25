@@ -5,9 +5,31 @@ import prisma from "../../config/prisma.js";
 
 const categoryController = {
   register: async (req, res, next) => {
-    const data = categorySchema.register.parse(req.body);
+  try {
+    const data = req.body;
+
+    // Check if any required field is missing
+    const requiredFields = ["name", "amount", "commition", "totalCount", "duration", "collectionCycle"];
+    for (const field of requiredFields) {
+      if (!data[field]) {
+        return res.status(403).json({
+          success: false,
+          message: `${field} is required`,
+        });
+      }
+    }
+    try {
+      categorySchema.register.parse(data);
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+      });
+    }
+
     req.body.totalAmount = req.body.totalCount * (req.body.amount + req.body.commition);
-     req.body.totalCommition = req.body.totalCount * req.body.commition; 
+    req.body.totalCommition = req.body.totalCount * req.body.commition;
+    
     const newCategory = await prisma.category.create({
       data: {
         name: data.name,
@@ -16,16 +38,26 @@ const categoryController = {
         totalCount: data.totalCount,
         totalAmount: req.body.totalAmount,
         totalCommition: req.body.totalCommition,
-        duration:data.duration,
-        collectionCycle: data.collectionCycle
+        duration: data.duration,
+        collectionCycle: data.collectionCycle,
       },
     });
+    
     return res.status(200).json({
       success: true,
       message: "Category registered",
       data: newCategory,
     });
-  },
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while creating the category",
+    });
+  }
+},
+
 
   update: async (req, res, next) => {
     const id = parseInt(req.params.id.substring(1));

@@ -12,11 +12,20 @@ import {isAuthUser,isAdmin} from "../../middlewares/auth.js"
 
 const loanController = {
       register: async (req, res, next) => {
-        console.log("sena");
-
-        const data = loanSchema.register.parse(req.body);
-      
         try {
+          
+          const requiredFields = ["lotId", "amount"];
+          for (const field of requiredFields) {
+            if (!req.body[field]) {
+              return res.status(403).json({
+                success: false,
+                message: `${field} is required`,
+              });
+            }
+          }
+      
+          const data = loanSchema.register.parse(req.body);
+      
           const lot = await prisma.lots.findUnique({
             where: { id: data.lotId },
           });

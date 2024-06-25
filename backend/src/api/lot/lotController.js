@@ -11,10 +11,18 @@ import {z} from "zod";
 
 const lotController = {
     register: async (req, res, next) => {
-        try {
-          console.log('Register function called'); 
-      
-          const data = lotSchema.register.parse(req.body); 
+       try {
+         const requiredFields = ["categoryId", "firstName", "middleName", "lastName", "city", "street", "gender"];
+           for (const field of requiredFields) {
+          if (!req.body[field]) {
+           return res.status(403).json({
+          success: false,
+          message: `${field} is required`,
+        });
+      }
+    }
+
+    const data = lotSchema.register.parse(req.body);
           console.log(data.categoryId);
           console.log('Parsed data:', data);
       

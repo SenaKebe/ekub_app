@@ -16,8 +16,17 @@ import { parseISO, startOfDay, endOfDay } from 'date-fns';
 const depositController = {
   register: async (req, res, next) => {
   
-    const data = depositSchema.register.parse(req.body);
-  
+    const requiredFields = ["lotId", "amount", "commition"];
+    for (const field of requiredFields) {
+      if (!req.body[field]) {
+        return res.status(403).json({
+          success: false,
+          message: `${field} is required`,
+        });
+      }
+    }
+
+    const data = depositSchema.register.parse(req.body);  
     try {
       const lot = await prisma.lots.findUnique({
         where: { id: data.lotId },

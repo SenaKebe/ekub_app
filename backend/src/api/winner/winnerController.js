@@ -4,8 +4,20 @@ import  winnerSchema  from "./winnerSchema.js";
 
 const winnerController = {
   register: async (req, res, next) => {
-    try {
-      const data = winnerSchema.register.parse(req.body);
+    
+  try {
+    // Check if any required field is missing
+    const requiredFields = ["lotId"];
+    for (const field of requiredFields) {
+      if (!req.body[field]) {
+        return res.status(403).json({
+          success: false,
+          message: `${field} is required`,
+        });
+      }
+    }
+
+    const data = winnerSchema.register.parse(req.body);
 
       const lot = await prisma.lots.findUnique({
         where: { id: data.lotId },
