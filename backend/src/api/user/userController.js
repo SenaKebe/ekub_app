@@ -52,7 +52,7 @@ const userController = {
           firstName: data.firstName,
           middleName: data.middleName,
           lastName: data.lastName,
-          gender: data.gender, // Ensure to include the gender field
+          gender: data.gender, 
         },
       });
   
@@ -72,6 +72,7 @@ const userController = {
   
   
   login : async (req, res, next) => {
+    try{
     const data = userSchema.login.parse(req.body);
   
     // Find user by email
@@ -123,7 +124,14 @@ const payload = {
       data: user,
       token: token,
     });
-  },
+  }catch (error) {
+    console.error('An error occurred:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'An error occurred while logging in',
+    });
+  }
+},
    getUserById :async (req, res, next) => {
     console.log("Fetching user by ID");
 
