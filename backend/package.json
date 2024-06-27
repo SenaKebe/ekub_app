@@ -11,10 +11,10 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "prisma": "^5.15.0"
+    "prisma": "^5.16.0"
   },
   "dependencies": {
-    "@prisma/client": "^5.14.0",
+    "@prisma/client": "^5.16.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
