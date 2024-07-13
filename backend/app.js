@@ -19,7 +19,7 @@ const corsOptions = {
   app.use("/api",appRoute)
 
   app.get("/", (req, res) => {
-    res.send("response");
+    res.send(`<h1>response new ${Date.now()} </h1>`);
   });
   
   app.listen(PORT, HOST, () => {
