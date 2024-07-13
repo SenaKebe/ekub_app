@@ -1,9 +1,9 @@
-import 'dart:convert';
+import 'package:mobileapp/models/lots_model.dart';
 
-class Category {
+class CategoryModel {
   final int id;
   final String name;
-  final double amount;
+  final int amount;
   final double commition;
   final DateTime createdAt;
   final int totalCount;
@@ -11,8 +11,9 @@ class Category {
   final double totalCommition;
   final String collectionCycle;
   final String duration;
+  final List<LotsModel>? lots;
 
-  Category({
+  CategoryModel({
     required this.id,
     required this.name,
     required this.amount,
@@ -23,20 +24,26 @@ class Category {
     required this.totalCommition,
     required this.collectionCycle,
     required this.duration,
+    required this.lots,
   });
 
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
-      id: json['id'],
-      name: json['name'],
-      amount: json['amount'].toDouble(),
-      commition: json['commition'].toDouble(),
-      createdAt: DateTime.parse(json['createdAt']),
-      totalCount: json['totalCount'],
-      totalAmount: json['totalAmount'].toDouble(),
-      totalCommition: json['totalCommition'].toDouble(),
-      collectionCycle: json['collectionCycle'],
-      duration: json['duration'],
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      amount: int.parse((json['amount'])),
+      commition: double.parse((json['commition'])),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      totalCount: json['totalCount'] as int,
+      totalAmount: double.parse(json['totalAmount']),
+      totalCommition: double.parse(json['totalCommition']),
+      collectionCycle: json['collectionCycle'] as String,
+      duration: json['duration'] as String,
+      lots: json["lot"] != null
+          ? (json["lot"] as List<dynamic>)
+              .map((e) => LotsModel.fromJson(e))
+              .toList()
+          : null,
     );
   }
 
@@ -45,13 +52,13 @@ class Category {
       'id': id,
       'name': name,
       'amount': amount,
-      'commition': commition,
-      'createdAt': createdAt.toIso8601String(),
-      'totalCount': totalCount,
-      'totalAmount': totalAmount,
-      'totalCommition': totalCommition,
-      'collectionCycle': collectionCycle,
-      'duration': duration,
+      // 'commition': commition,
+      // 'createdAt': createdAt.toIso8601String(),
+      // 'totalCount': totalCount,
+      // 'totalAmount': totalAmount,
+      // 'totalCommition': totalCommition,
+      // 'collectionCycle': collectionCycle,
+      // 'duration': duration,
     };
   }
 }

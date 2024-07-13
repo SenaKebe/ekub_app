@@ -33,20 +33,8 @@ router.get("/commission",depositController.getCommissionForPeriod);// remaining 
 router.put("/update/:id",[isAuthUser,isUser],depositController.update);
 router.delete("/delete/:id",depositController.deleteDeposit);
 
-
-
-
-
-
-//  consider week from the month
-// router.get("/period/deposit",depositController.getDepositsForPeriodWithDeposit);
-// router.get("/period",depositController.getDepositsForPeriod); 
-// router.get("/total/remaining",depositController.getTotalRemainingDepositsForPeriod);
-
-
-// router.get("/week",depositController.getDepositsGroupedByDay);
-
-
+//test dash
+router.get("/test",depositController.getAllStatistics);
 
 
 export default router

@@ -3,7 +3,7 @@ const router = express.Router();
 import categoryController from "./categoryController.js";
 import {isAuthUser,isAdmin,isUser} from "../../middlewares/auth.js"
 
-router.post("/register",[isAuthUser,isAdmin] ,categoryController.register);
+router.post("/register" ,categoryController.register);
 router.get("/getCategory/:id", categoryController.getSingleCategory);
 router.get("/getAllCategory", categoryController.getAllCategories);
 router.put("/update/:id",[isAuthUser,isAdmin], categoryController.update);

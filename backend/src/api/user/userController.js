@@ -12,7 +12,7 @@ import {isAuthUser,isAdmin} from "../../middlewares/auth.js"
 
 const userController = {
   register: async (req, res, next) => {
-    console.log("sena");
+    console.log(req.body);
   
     try {
       const requiredFields = ["email", "firstName", "middleName", "lastName"];
@@ -72,6 +72,7 @@ const userController = {
   
   
   login : async (req, res, next) => {
+    console.log("..........login...........", req.body);
     try{
     const data = userSchema.login.parse(req.body);
   
@@ -133,7 +134,7 @@ const payload = {
   }
 },
    getUserById :async (req, res, next) => {
-    console.log("Fetching user by ID");
+    // console.log("Fetching user by ID");
 
     try {
         const userId = parseInt(req.params.id.substring(1), 10);
@@ -172,7 +173,7 @@ const payload = {
     }
 },
 getAllUsers : async (req, res, next) => {
-  console.log("Fetching all users");
+ // console.log("Fetching all users");
 
   try {
       const users = await prisma.users.findMany({
@@ -191,7 +192,7 @@ getAllUsers : async (req, res, next) => {
   }
 },
  updateUserStatusToInactive : async (req, res, next) => {
-  console.log("Updating user status to inactive");
+  // console.log("Updating user status to inactive");
 
   try {
       const userId = parseInt(req.params.id.substring(1), 10);
@@ -237,7 +238,7 @@ changePassword: async (req, res) => {
     req.body.id = req.userId;
     const data = userSchema.changePassword.parse(req.body);
 
-    console.log("User ID:", data.id);
+    // console.log("User ID:", data.id);
 
     const user = await prisma.users.findUnique({
       where: { id: data.id },
@@ -288,7 +289,7 @@ changePassword: async (req, res) => {
 
 updateUser: async (req, res, next) => {
   try {
-    console.log("Update user function called");
+    // console.log("Update user function called");
 
     const data = userSchema.update.parse(req.body);
 

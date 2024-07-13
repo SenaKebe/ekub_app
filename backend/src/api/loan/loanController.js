@@ -197,7 +197,16 @@ const loanController = {
       
       getAllLoans: async (req, res, next) => {
         try {
-          const allLoans = await prisma.loans.findMany();
+          const allLoans = await prisma.loans.findMany({
+            include:{
+              lot:{
+                include:{
+                  profile: true,
+                  category:true,
+                }
+              }
+            }
+          });
       
           return res.status(200).json({
             success: true,

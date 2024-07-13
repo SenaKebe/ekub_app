@@ -6,9 +6,6 @@ import jwt from "jsonwebtoken";
 import { STATUS } from "@prisma/client";
 import { SECRET } from "../../config/secrets.js";
 import {z} from "zod";
-// import { generatePassword } from "../../util/generateor.js";
-// import { sendEmail } from "../../util/emailSender.js";
-
 const lotController = {
     register: async (req, res, next) => {
        try {
@@ -53,7 +50,7 @@ const lotController = {
             data: {
               isCompleted: false,
               categoryId: data.categoryId,
-              registeredBy: req.user.id, 
+              registeredBy: 1,//req.user.id, 
               remainingDay: totalCount,
               remainingAmount: totalAmount,
               profile: {
@@ -64,7 +61,7 @@ const lotController = {
                   city: data.city,
                   street: data.street,
                   gender: data.gender.toUpperCase(), 
-                  userId: req.user.id, 
+                  userId: 1//req.user.id, 
                 },
               },
             },
@@ -99,7 +96,7 @@ const lotController = {
         }
 
       },
-      getUserInfo: async (req, res, next) => {
+    getUserInfo: async (req, res, next) => {
         const lotId = parseInt(req.params.id.substring(1), 10);
 
         try {
@@ -129,6 +126,43 @@ const lotController = {
                 message: 'An error occurred while retrieving the lot',
             });
         }
+    },
+    getAllLotosInfo: async (req, res, next) => {
+      try {
+          const lot = await prisma.lots.findMany({
+              include: {
+                  category: {
+                    include:{
+                      _count: true,
+                    }
+                  },
+                  profile: true,
+                  deposits: true,
+                  loans: true,
+                  _count:true,
+                  returnedRemaining: true,
+                  winners: true,
+              },
+          });
+  
+          if (!lot) {
+              return res.status(404).json({
+                  success: false,
+                  message: 'Lot not found',
+              });
+          }
+  
+          return res.status(200).json({
+              success: true,
+              data: lot,
+          });
+      } catch (error) {
+          console.error('An error occurred:', error);
+          return res.status(500).json({
+              success: false,
+              message: 'An error occurred while retrieving the lot',
+          });
+      }
     },
     getLotwithCategory: async (req, res, next) => {
         const lotId = parseInt(req.params.id.substring(1), 10);
@@ -221,7 +255,6 @@ const lotController = {
         }
     },
 
-
     updateProfile: async (req, res, next) => {
         const lotId = parseInt(req.params.id.substring(1), 10);
 
@@ -266,8 +299,9 @@ const lotController = {
             message: 'An error occurred while updating the profile',
         });
     }
-},
- deleteLot: async (req, res, next) => {
+    },
+    
+    deleteLot: async (req, res, next) => {
         const lotId = parseInt(req.params.id.substring(1), 10);
     try {
         console.log('Delete function called'); 
